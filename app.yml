@@ -1,0 +1,335 @@
+openapi: '3.0.2'
+info:
+  title: App Clients API
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /app-clients/app-profiles:
+    get:
+      parameters:
+        - in: header
+          name: X-App-Client-Id
+          schema:
+            type: string
+            example: "123"
+          required: true
+      operationId: getAppProfile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./app-profile.yml#/components/schemas/AppProfileResponse"  
+        '404':
+          description: App profiles not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+  /apps/app-clients/terms-conditions/lang/{lang}:
+    get:        
+      parameters:
+      - in: header
+        name: X-App-Client-Id
+        schema:
+          type: string
+          example: "232"
+        required: true 
+      - in: path
+        name: lang
+        schema:
+          type: string
+          format: string
+          example: en
+        required: true     
+      operationId: getAppConsent
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./consent.yml#/components/schemas/ConsentResponse"  
+        '404':
+          description: App consent not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'           
+  /apps/app-clients/terms-conditions/{consentId}:
+    get:        
+      parameters:
+      - in: header
+        name: X-App-Client-Id
+        schema:
+          type: string
+          example: "232"
+        required: true 
+      - in: path
+        name: consentId
+        schema:
+          type: integer
+          format: int64
+          example: 1
+        required: true     
+      operationId: getAppConsentById
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./consent.yml#/components/schemas/ConsentResponse"  
+        '404':
+          description: App consent not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'   
+  /app-clients/save-client/{lang}:
+    post:  
+      operationId: saveAppClient
+      parameters:
+      - in: header
+        name: X-Client-Id
+        schema:
+          type: string   
+        required: true  
+      - in: path
+        name: lang
+        schema:
+          type: string
+          example : en
+        required: true     
+      requestBody:
+        description: Save a new app client
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "./client.yml#/components/schemas/SaveClientRequest"
+      responses:
+        '201':
+          description: New app client created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./client.yml#/components/schemas/SaveClientResponse"
+        '400' : 
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+  /app-clients/lang/{lang}:
+    get:
+      operationId: getAppClients
+      description: Find a list of app client summary
+      parameters:
+        - in: query
+          name: page
+          schema:
+              type: integer
+              format: int64 
+          required: true 
+          description: Page number for pagination in appclient listing
+        - in: query
+          name: size
+          schema:
+              type: integer
+              format: int64 
+          required: true  
+          description: Page content size for pagination in appclient listing
+        - in: path
+          name: lang
+          schema:
+              type: string
+              example : en
+          required: true  
+          description: Language of appclient list
+      responses:
+        '200':
+          description: Successfully found app clients
+          content:
+            application/json:
+              schema:
+                $ref: "./client.yml#/components/schemas/AppClientsResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse' 
+        '404':
+          description: App clients are not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse' 
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse' 
+  /app-clients/{appId}/lang/{lang}:
+    get:
+      operationId: viewAppClient
+      description: View app client summary
+      parameters:
+        - in: path
+          name: appId
+          schema:
+              type: integer
+              example : 1
+          required: true  
+          description: id of app client
+        - in: path
+          name: lang
+          schema:
+              type: string
+              example : en
+          required: true  
+          description: Language of appclient
+      responses:
+        '200':
+          description: Successfully found app clients
+          content:
+            application/json:
+              schema:
+                $ref: "./client.yml#/components/schemas/AppClientResponse"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse' 
+        '404':
+          description: App client not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse' 
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse' 
+  /app-clients/{appClientId}:
+    put:  
+      operationId: updateAppClient
+      parameters:
+      - in: header
+        name: X-Client-Id
+        schema:
+          type: string
+        required: true
+      - in: path    
+        name: appClientId
+        schema:
+          type: integer
+          format: int64
+          example : 16   
+        required: true   
+      requestBody:
+        description: update a new app client
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "./client.yml#/components/schemas/UpdateClientRequest"
+      responses:
+        '201':
+          description: app client updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./client.yml#/components/schemas/UpdateClientResponse"
+        '400' : 
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteAppClient
+      description: Delete app client summary
+      parameters:
+        - in: header
+          name: X-Client-Id
+          schema:
+            type: string
+            example: "mvp1"
+          required: true
+        - in: path
+          name: appClientId
+          schema:
+              type: integer
+              format: int64
+              example : 1
+          required: true  
+          description: id of app client
+      responses:
+        '200':
+          description: App client details deleted successfully
+          content:
+            application/json:
+              schema: 
+                $ref : "./client.yml#/components/schemas/AppClientDeleteResponse"
+        '404':
+          description: App client not found
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: './common.yml#/components/schemas/ErrorResponse'
